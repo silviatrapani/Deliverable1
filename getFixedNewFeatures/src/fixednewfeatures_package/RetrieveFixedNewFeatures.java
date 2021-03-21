@@ -6,11 +6,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Collections;
 import java.util.Comparator;
 import java.time.LocalDate;
@@ -21,8 +22,8 @@ import org.json.JSONArray;
 
 public class RetrieveFixedNewFeatures {
 	
-   public static ArrayList<LocalDateTime> featuresFixed;
-   public static HashMap<LocalDateTime, String> issueKey;
+   public static final List<LocalDateTime> featuresFixed = new ArrayList<LocalDateTime>();
+   public static final Map<LocalDateTime, String> issueKey = new HashMap<> ();
 
    private static String readAll(Reader rd) throws IOException {
 	      StringBuilder sb = new StringBuilder();
@@ -63,7 +64,7 @@ public class RetrieveFixedNewFeatures {
 		   Integer j = 0;
 		   Integer i = 0;
 		   Integer total = 1;
-		   featuresFixed = new ArrayList<LocalDateTime>();
+		
 	do {
 		 //Get JSON API for fixed new features w/ AV in the project
 		   j = i + 1000;
@@ -72,7 +73,6 @@ public class RetrieveFixedNewFeatures {
 	                 + i.toString() + "&maxResults=" + j.toString();
       JSONObject json = readJsonFromUrl(url);
       JSONArray issues = json.getJSONArray("issues");
-      issueKey = new HashMap<> ();
       
       total = json.getInt("total");
       for (; i < total && i<j; i++ ) {
