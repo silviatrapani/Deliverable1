@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,8 +21,8 @@ import org.json.JSONArray;
 
 public class RetrieveFixedNewFeatures {
 	
-   public static ArrayList<LocalDateTime> features_fixed;
-   public static HashMap<LocalDateTime, String> issue_key;
+   public static ArrayList<LocalDateTime> featuresFixed;
+   public static HashMap<LocalDateTime, String> issueKey;
 
    private static String readAll(Reader rd) throws IOException {
 	      StringBuilder sb = new StringBuilder();
@@ -35,10 +36,9 @@ public class RetrieveFixedNewFeatures {
    public static JSONArray readJsonArrayFromUrl(String url) throws IOException, JSONException {
 	      InputStream is = new URL(url).openStream();
 	      try {
-	         BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+	         BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
 	         String jsonText = readAll(rd);
-	         JSONArray json = new JSONArray(jsonText);
-	         return json;
+	         return new JSONArray(jsonText);
 	       } finally {
 	         is.close();
 	       }
@@ -47,10 +47,9 @@ public class RetrieveFixedNewFeatures {
    public static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
       InputStream is = new URL(url).openStream();
       try {
-         BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+         BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
          String jsonText = readAll(rd);
-         JSONObject json = new JSONObject(jsonText);
-         return json;
+         return new JSONObject(jsonText);
        } finally {
          is.close();
        }
@@ -61,8 +60,10 @@ public class RetrieveFixedNewFeatures {
   	   public static void main(String[] args) throws IOException, JSONException {
 		   
 		   String projName ="TAJO";
-		   Integer j = 0, i = 0, total = 1;
-		   features_fixed = new ArrayList<LocalDateTime>();
+		   Integer j = 0;
+		   Integer i = 0;
+		   Integer total = 1;
+		   featuresFixed = new ArrayList<LocalDateTime>();
 	do {
 		 //Get JSON API for fixed new features w/ AV in the project
 		   j = i + 1000;
@@ -71,7 +72,7 @@ public class RetrieveFixedNewFeatures {
 	                 + i.toString() + "&maxResults=" + j.toString();
       JSONObject json = readJsonFromUrl(url);
       JSONArray issues = json.getJSONArray("issues");
-      issue_key = new HashMap<LocalDateTime, String> ();
+      issueKey = new HashMap<> ();
       
       total = json.getInt("total");
       for (; i < total && i<j; i++ ) {
@@ -88,13 +89,13 @@ public class RetrieveFixedNewFeatures {
 
 	
    // sort fixdates
-      Collections.sort(features_fixed, new Comparator<LocalDateTime>(){
+      Collections.sort(featuresFixed, new Comparator<LocalDateTime>(){
          //@Override
          public int compare(LocalDateTime o1, LocalDateTime o2) {
              return o1.compareTo(o2);
          }
       });
-      if (features_fixed.size() < 6)
+      if (featuresFixed.size() < 6)
          return;
       FileWriter fileWriter = null;
 	 try {
@@ -104,13 +105,13 @@ public class RetrieveFixedNewFeatures {
 				    fileWriter = new FileWriter(outname);
          fileWriter.append("Index,Key,Date");
          fileWriter.append("\n");
-         for ( i = 0; i < features_fixed.size(); i++) {
+         for ( i = 0; i < featuresFixed.size(); i++) {
             Integer index = i + 1;
             fileWriter.append(index.toString());
             fileWriter.append(",");
-            fileWriter.append(issue_key.get(features_fixed.get(i)));
+            fileWriter.append(issueKey.get(featuresFixed.get(i)));
             fileWriter.append(",");
-            fileWriter.append(features_fixed.get(i).toString());
+            fileWriter.append(featuresFixed.get(i).toString());
             fileWriter.append("\n");
          }
 
@@ -126,20 +127,18 @@ public class RetrieveFixedNewFeatures {
             e.printStackTrace(); 
          }
       }
-      
-      
-      return;
    }
   	   
   	
 
   	 public static void addRelease(String strDate, String id) {
-	      LocalDate date = LocalDate.parse(strDate);
+  		 LocalDate date = LocalDate.parse(strDate);
 	      LocalDateTime dateTime = date.atStartOfDay();
 	      //if (!features_fixed.contains(dateTime))
-	         features_fixed.add(dateTime);
-	      issue_key.put(dateTime, id);
+	         featuresFixed.add(dateTime);
+	      issueKey.put(dateTime, id);
 	      return;
-	   }
- 
-}
+	  }
+  	 }
+
+
