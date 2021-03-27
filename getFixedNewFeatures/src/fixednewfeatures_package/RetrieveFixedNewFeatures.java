@@ -61,7 +61,6 @@ public class RetrieveFixedNewFeatures {
 	   
 	   String projName ="TAJO";
 	   Integer j = 0;
-	   Integer i = 0;
 	   Integer total = 1;
 	   //Get JSON API for fixed new features w/ AV in the project
 	   j = i + 1000;
